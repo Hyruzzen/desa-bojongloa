@@ -47,7 +47,7 @@
     </button>
 
     <div class="flex h-screen w-full overflow-hidden">
-        <aside id="app-sidebar" class="w-64 flex-shrink-0 h-full border-r bg-white fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-200 md:translate-x-0 md:static md:relative md:h-full">
+        <aside id="app-sidebar" class="w-64 flex-shrink-0 h-full border-r bg-white fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-200 md:translate-x-0 md:static md:relative md:h-full flex flex-col">
             <div class="px-6 py-5 border-b border-slate-100">
                 <p class="text-lg font-bold leading-tight text-slate-900">E-Arsip</p>
                 <p class="text-xs text-slate-500">Desa Bojongloa</p>
@@ -78,7 +78,7 @@
                 </a>
             </nav>
 
-            <div class="px-4 pb-4">
+            <div class="px-4 pb-4 mt-auto">
                 <div class="rounded-2xl bg-slate-50 border border-slate-100 px-3 py-3">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 text-white flex items-center justify-center text-xs font-bold">

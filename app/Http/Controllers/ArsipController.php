@@ -109,6 +109,14 @@ class ArsipController extends Controller
 
 
 
+        // Pastikan salah satu sumber file tersedia
+        if (!$request->hasFile('file') && !session()->has('hasil_scan.file_path')) {
+            return back()
+                ->withInput()
+                ->withErrors(['file' => 'File dokumen wajib diupload atau gunakan fitur Scan Dokumen.']);
+        }
+
+
         $path = null;
 
         $namaAsli = null;
@@ -118,7 +126,7 @@ class ArsipController extends Controller
 
         // Upload manual
 
-        if($request->hasFile('file'))
+        if ($request->hasFile('file'))
         {
 
             $file = $request->file('file');
@@ -156,7 +164,7 @@ class ArsipController extends Controller
 
         // File hasil scan
 
-        elseif(session()->has('hasil_scan.file_path'))
+        elseif (session()->has('hasil_scan.file_path'))
         {
 
             $tempPath =
@@ -173,11 +181,14 @@ class ArsipController extends Controller
 
 
 
-            Storage::disk('public')
-                ->move(
-                    $tempPath,
-                    $pathBaru
-                );
+            // Cek file temp masih ada sebelum dipindah
+            if (Storage::disk('public')->exists($tempPath)) {
+                Storage::disk('public')
+                    ->move(
+                        $tempPath,
+                        $pathBaru
+                    );
+            }
 
 
 
@@ -187,18 +198,6 @@ class ArsipController extends Controller
 
             $namaAsli =
                 $namaFile;
-
-        }
-
-
-
-        else
-        {
-
-            return back()
-                ->withErrors([
-                    'file'=>'File dokumen belum tersedia.'
-                ]);
 
         }
 
