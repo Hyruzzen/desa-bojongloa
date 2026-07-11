@@ -70,7 +70,9 @@ class ArsipController extends Controller
     {
         $kategoris = Kategori::orderBy('nama')->get();
 
-        $hasilScan = session()->get('hasil_scan');
+        // Gunakan pull() agar session otomatis dihapus setelah dibaca
+        // sehingga data scan lama tidak muncul di kunjungan berikutnya
+        $hasilScan = session()->pull('hasil_scan');
 
 
         return view('arsip.create', compact(
@@ -105,12 +107,17 @@ class ArsipController extends Controller
             'file'
                 => 'nullable|file|mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx|max:10240',
 
+            'scan_file_path'
+                => 'nullable|string',
+
         ]);
 
 
 
         // Pastikan salah satu sumber file tersedia
-        if (!$request->hasFile('file') && !session()->has('hasil_scan.file_path')) {
+        $hasScanFile = !empty($request->input('scan_file_path'));
+
+        if (!$request->hasFile('file') && !$hasScanFile) {
             return back()
                 ->withInput()
                 ->withErrors(['file' => 'File dokumen wajib diupload atau gunakan fitur Scan Dokumen.']);
@@ -162,13 +169,13 @@ class ArsipController extends Controller
 
 
 
-        // File hasil scan
+        // File hasil scan (dikirim via hidden input scan_file_path)
 
-        elseif (session()->has('hasil_scan.file_path'))
+        elseif ($hasScanFile)
         {
 
             $tempPath =
-                session('hasil_scan.file_path');
+                $request->input('scan_file_path');
 
 
             $namaFile =
@@ -188,6 +195,9 @@ class ArsipController extends Controller
                         $tempPath,
                         $pathBaru
                     );
+            } else {
+                // File temp sudah tidak ada, set path saja (mungkin sudah dipindah)
+                $pathBaru = $tempPath;
             }
 
 
@@ -444,4 +454,59 @@ class ArsipController extends Controller
 
     }
 
+    public function export(Request $request)
+    {
+        $arsips = Arsip::with('kategori', 'user')
+            ->when($request->q, function ($query) use ($request) {
+                $query->where(function ($sub) use ($request) {
+                    $sub->where('judul', 'like', "%{$request->q}%")
+                        ->orWhere('nomor_arsip', 'like', "%{$request->q}%")
+                        ->orWhere('deskripsi', 'like', "%{$request->q}%");
+                });
+            })
+            ->when($request->kategori_id, fn($q) => $q->where('kategori_id', $request->kategori_id))
+            ->when($request->dari, fn($q) => $q->whereDate('tanggal_arsip', '>=', $request->dari))
+            ->when($request->sampai, fn($q) => $q->whereDate('tanggal_arsip', '<=', $request->sampai))
+            ->latest('tanggal_arsip')
+            ->get();
+
+        $filename = "Laporan_Arsip_" . date('Y-m-d_Hi') . ".csv";
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['No', 'Judul', 'Nomor Arsip', 'Kategori', 'Tanggal Arsip', 'Deskripsi', 'Nama File', 'Pengunggah'];
+
+        $callback = function() use($arsips, $columns) {
+            $file = fopen('php://output', 'w');
+            
+            // Add BOM for UTF-8 Excel support
+            fputs($file, "\xEF\xBB\xBF");
+            
+            // Use semicolon as delimiter which is standard for Excel in ID locale
+            fputcsv($file, $columns, ';');
+
+            $no = 1;
+            foreach ($arsips as $arsip) {
+                fputcsv($file, [
+                    $no++,
+                    $arsip->judul,
+                    $arsip->nomor_arsip ?: '-',
+                    $arsip->kategori->nama ?? '-',
+                    $arsip->tanggal_arsip->format('Y-m-d'),
+                    str_replace(["\r", "\n"], " ", $arsip->deskripsi ?: '-'),
+                    $arsip->file_asli ?: '-',
+                    $arsip->user->name ?? '-'
+                ], ';');
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

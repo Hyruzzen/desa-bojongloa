@@ -21,6 +21,9 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('kategori', KategoriController::class)->except(['show']);
 
+    // Export route — harus sebelum resource
+    Route::get('/arsip/export', [ArsipController::class, 'export'])->name('arsip.export');
+
     // Scan routes — harus sebelum resource agar tidak tertimpa
     Route::get('/arsip/scan', [ScannerController::class, 'index'])->name('arsip.scan');
     Route::post('/arsip/scan', [ScannerController::class, 'scan'])->name('arsip.scan.process');

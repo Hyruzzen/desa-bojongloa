@@ -61,12 +61,12 @@
 
                 @php($isArsip = request()->routeIs('arsip.*'))
                 <a href="{{ route('arsip.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors {{ $isArsip ? 'bg-slate-50 text-slate-900 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent' }}">
-                    <span>Folder</span>
+                    <span>Arsip Dokumen</span>
                 </a>
 
                 @php($isKategori = request()->routeIs('kategori.*'))
                 <a href="{{ route('kategori.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors {{ $isKategori ? 'bg-slate-50 text-slate-900 shadow-sm border border-slate-100' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent' }}">
-                    <span>Documents</span>
+                    <span>Kategori</span>
                 </a>
 
                 <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900 border border-transparent">

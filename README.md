@@ -93,3 +93,10 @@ Saya tulis/tempel kode ini secara manual berdasarkan isi `repomix-output.xml` ya
 - Log aktivitas (audit trail)
 - Fitur ubah password/profil dari UI
 - Backup otomatis
+
+## Upload kode terbaru ke github
+
+- git add .
+- git commit -m "Pesan commit bebas"
+- git push -u origin main  (jka pertamakali)
+- git push

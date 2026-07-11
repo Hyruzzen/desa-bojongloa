@@ -24,6 +24,11 @@
                 Reset
                 </a>
                <div class="ml-auto flex gap-2">
+               <a href="{{ route('arsip.export', request()->query()) }}"
+                  class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
+                   📥 Export Laporan
+               </a>
+
                <a href="{{ route('arsip.scan') }}"
                   class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
                    🔍 Scan Dokumen

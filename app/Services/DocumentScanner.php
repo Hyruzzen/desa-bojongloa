@@ -8,8 +8,10 @@ use Throwable;
 class DocumentScanner
 {
     public function __construct(
-        private GeminiService $gemini
+        private GeminiService $gemini,
+        private OcrService $ocr
     ) {}
+
 
     /**
      * Scan dokumen dan ekstrak metadata menggunakan Gemini AI.
@@ -27,10 +29,11 @@ class DocumentScanner
             return $this->scanPdf($file);
         }
 
-        // --- Gambar (JPG/PNG): kirim ke Gemini Vision ---
+        // --- Gambar (JPG/PNG): bisa Gemini Vision atau OCR fallback ---
         if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
             return $this->scanImage($file);
         }
+
 
         // Format tidak dikenali
         return $this->emptyResult();
@@ -76,9 +79,24 @@ class DocumentScanner
             return $result;
         }
 
-        // Fallback jika tanpa Gemini: tidak bisa baca gambar
+        // Fallback jika tanpa Gemini: OCR untuk ekstrak teks dari gambar
+        $text = '';
+        try {
+            $text = $this->ocr->read($file->getRealPath());
+        } catch (Throwable $e) {
+            $text = '';
+        }
+
+        if (!empty($text)) {
+            return array_merge(
+                $this->legacyExtract($text),
+                ['text' => $text]
+            );
+        }
+
         return $this->emptyResult();
     }
+
 
     // -------------------------------------------------------------------------
     // Fallback regex lama (dipakai jika Gemini tidak dikonfigurasi)

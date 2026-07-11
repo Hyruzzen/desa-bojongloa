@@ -13,12 +13,37 @@
 
     {{-- Banner hasil scan AI --}}
     @if(isset($hasilScan))
-        @if(!empty($hasilScan['ai_powered']))
+        @if(!empty($hasilScan['ai_powered']) && empty($hasilScan['last_error']))
             <div class="mb-5 flex items-start gap-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 px-4 py-4">
                 <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold shrink-0 mt-0.5">AI</div>
                 <div>
-                    <p class="text-sm font-semibold text-blue-800">Dianalisis oleh Gemini AI ✨</p>
+                    <p class="text-sm font-semibold text-blue-800">Analisis selesai</p>
                     <p class="text-xs text-blue-600 mt-0.5">Field di bawah telah diisi otomatis berdasarkan hasil analisis AI. Periksa dan koreksi jika diperlukan sebelum menyimpan.</p>
+                </div>
+            </div>
+        @elseif(isset($hasilScan['last_error']) && $hasilScan['last_error'] === 'quota_exhausted')
+            <div class="mb-5 flex items-start gap-3 rounded-2xl bg-amber-50 border border-amber-200 px-4 py-4">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold shrink-0 mt-0.5">!</div>
+                <div>
+                    <p class="text-sm font-semibold text-amber-800">Kuota Gemini AI Habis</p>
+                    <p class="text-xs text-amber-600 mt-0.5">Kuota gratis Gemini AI sudah habis. Dokumen dipindai menggunakan metode dasar (akurasi terbatas). Isi manual field yang kosong.</p>
+                    <p class="text-xs text-amber-500 mt-1">Untuk mengaktifkan kembali AI, perbarui API key Gemini di file <code>.env</code>.</p>
+                </div>
+            </div>
+        @elseif(isset($hasilScan['last_error']) && $hasilScan['last_error'] === 'invalid_key')
+            <div class="mb-5 flex items-start gap-3 rounded-2xl bg-red-50 border border-red-200 px-4 py-4">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">✕</div>
+                <div>
+                    <p class="text-sm font-semibold text-red-800">API Key Gemini Tidak Valid</p>
+                    <p class="text-xs text-red-600 mt-0.5">Dokumen dipindai menggunakan metode dasar. Periksa konfigurasi GEMINI_API_KEY di file <code>.env</code>.</p>
+                </div>
+            </div>
+        @elseif(isset($hasilScan['last_error']) && $hasilScan['last_error'] === 'api_error')
+            <div class="mb-5 flex items-start gap-3 rounded-2xl bg-red-50 border border-red-200 px-4 py-4">
+                <div class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold shrink-0 mt-0.5">✕</div>
+                <div>
+                    <p class="text-sm font-semibold text-red-800">Koneksi API Gagal</p>
+                    <p class="text-xs text-red-600 mt-0.5">Tidak dapat terhubung ke Gemini API. Pastikan koneksi internet stabil atau periksa log sistem. Dokumen dipindai menggunakan metode dasar.</p>
                 </div>
             </div>
         @else
@@ -123,7 +148,9 @@
                 <div class="md:col-span-2">
                     <label class="block text-sm font-medium text-slate-700 mb-1">File Dokumen</label>
 
-                    @if(isset($hasilScan['file_path']))
+                    @if(isset($hasilScan['file_path']) && $hasilScan['file_path'])
+                        {{-- Hidden input untuk kirim file_path hasil scan ke store() --}}
+                        <input type="hidden" name="scan_file_path" value="{{ $hasilScan['file_path'] }}">
                         <div class="flex items-center gap-3 rounded-xl bg-green-50 border border-green-200 px-4 py-3">
                             <svg class="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>

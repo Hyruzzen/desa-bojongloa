@@ -25,6 +25,9 @@
             <div>
                 <p class="text-sm font-semibold text-amber-800">Mode Dasar Aktif</p>
                 <p class="text-xs text-amber-600">Gemini AI belum dikonfigurasi. Sistem menggunakan deteksi teks biasa (akurasi terbatas).</p>
+                @if(!empty($configError))
+                    <p class="text-xs text-red-500 mt-1 font-mono">⚠ {{ $configError }}</p>
+                @endif
             </div>
         </div>
     @endif

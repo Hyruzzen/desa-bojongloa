@@ -1,20 +1,15 @@
-# TODO - File Manager Dashboard UI
+# TODO - Perbaikan Fitur Scan Dokumen
 
-- [x] Update `resources/views/layouts/app.blade.php` to match File Manager Dashboard design:
-  - [x] Soft teal-blue background
-  - [x] Left white minimal sidebar with consistent gray icons
-  - [x] User profile section at bottom
-  - [x] Sticky/affixed sidebar (does not scroll with main content)
-  - [x] Header: “My Folders” + subtitle, icons on the right, and “+” action button
-  - [x] Add hamburger button to show/hide sidebar (mobile)
+## Rencana
+1. Tambahkan logging debug pada alur scan untuk mengetahui apakah hasil kosong karena Gemini gagal/parsing, atau PDF/ekstraksi teks.
+2. Perbaiki `GeminiService::callApi()` agar pengambilan `text` tidak hardcode index `parts[0]`, melainkan mencari text pertama yang tersedia.
+3. Tambahkan fallback OCR saat Gemini tidak aktif untuk file gambar (JPG/PNG), lalu gunakan `legacyExtract()` dari hasil OCR.
+4. Jalankan testing pada 3 skenario: PDF+Gemini aktif, PDF+Gemini nonaktif, Gambar+Gemini nonaktif.
 
-- [x] Update `resources/views/dashboard.blade.php` to match required dashboard sections:
-  - [x] Top 3 folder summary cards with gradient icons + green progress bars
-  - [x] Big multi-color bar chart (Mon-Sun + value labels 2514/825/789)
-  - [x] “Photos” and “Videos” favorite cards with counts and avatar stack
-  - [x] Right sidebar section inside dashboard: storage donut (65% Used) + “Other Folders” list
-  - [x] Add graceful fallbacks when category data is fewer than expected
-- [ ] Run quick sanity check (manual):
-  - [ ] `php artisan serve` and verify `/dashboard` loads without Blade errors
-  - [ ] Verify charts render and layout matches reference
+## Status
+- [x] Step 1: Logging debug
+- [x] Step 2: Robust parsing response Gemini
+- [x] Step 3: OCR fallback untuk gambar
+- [ ] Step 4: Testing & verifikasi
+
 
