@@ -31,7 +31,7 @@
 
                <a href="{{ route('arsip.scan') }}"
                   class="bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
-                   🔍 Scan Dokumen
+                   🪄
                </a>
 
                <a href="{{ route('arsip.create') }}"

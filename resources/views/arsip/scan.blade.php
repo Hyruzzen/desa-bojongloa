@@ -15,7 +15,7 @@
         <div class="mb-5 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 px-4 py-3">
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">AI</div>
             <div>
-                <p class="text-sm font-semibold text-blue-800">Gemini AI Aktif ✨</p>
+                <p class="text-sm font-semibold text-blue-800">Gemini AI Aktif</p>
                 <p class="text-xs text-blue-600">Dokumen akan dianalisis menggunakan Google Gemini untuk hasil yang lebih presisi.</p>
             </div>
         </div>

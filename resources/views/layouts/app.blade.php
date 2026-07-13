@@ -6,6 +6,13 @@
     <title>@yield('title', 'Dashboard') - E-Arsip Desa Bojongloa</title>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <style>
         html,
         body {
@@ -30,17 +37,13 @@
             background-color: #f8fafc;
         }
 
-        .app-content-inner {
-            padding: 0 2rem 2rem;
-        }
-
         .sidebar-open {
             transform: translateX(0) !important;
         }
     </style>
 </head>
 <body class="bg-[#EAFBFA] text-slate-800 font-sans antialiased">
-    <button id="sidebar-toggle" class="md:hidden fixed top-4 left-4 z-50 w-11 h-11 rounded-xl bg-white shadow-sm border border-slate-100 flex items-center justify-center">
+    <button id="sidebar-toggle" class="md:hidden fixed top-0 left-0 z-50 w-12 h-12 rounded-none rounded-br-2xl bg-white shadow-sm border-r border-b border-slate-200 flex items-center justify-center">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4 6h16M4 12h16M4 18h16" stroke="#0F172A" stroke-width="2" stroke-linecap="round"/>
         </svg>
@@ -49,8 +52,10 @@
     <div class="flex h-screen w-full overflow-hidden">
         <aside id="app-sidebar" class="w-64 flex-shrink-0 h-full border-r bg-white fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-200 md:translate-x-0 md:static md:relative md:h-full flex flex-col">
             <div class="px-6 py-5 border-b border-slate-100">
-                <p class="text-lg font-bold leading-tight text-slate-900">E-Arsip</p>
-                <p class="text-xs text-slate-500">Desa Bojongloa</p>
+                <div class="pl-12 md:pl-0">
+                    <p class="text-lg font-bold leading-tight text-slate-900">E-Arsip</p>
+                    <p class="text-xs text-slate-500">Desa Bojongloa</p>
+                </div>
             </div>
 
             <nav class="flex-1 px-3 py-4 space-y-1">
@@ -77,6 +82,22 @@
                     <span>Settings</span>
                 </a>
             </nav>
+
+            <div class="px-4 pb-3">
+                <button id="theme-toggle" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 border border-slate-100 transition-colors">
+                    <span class="flex items-center gap-2">
+                        <svg id="theme-icon-light" class="hidden w-4.5 h-4.5 text-amber-500 animate-[spin_4s_linear_infinite]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="5"></circle>
+                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                        </svg>
+                        <svg id="theme-icon-dark" class="w-4.5 h-4.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span id="theme-text">Mode Gelap</span>
+                    </span>
+                    <span class="text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-mono uppercase" id="theme-badge">Off</span>
+                </button>
+            </div>
 
             <div class="px-4 pb-4 mt-auto">
                 <div class="rounded-2xl bg-slate-50 border border-slate-100 px-3 py-3">
@@ -131,24 +152,69 @@
 
     <script>
         (function() {
+            // Sidebar toggle logic
             const btn = document.getElementById('sidebar-toggle');
             const sidebar = document.getElementById('app-sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
 
-            if (!btn || !sidebar) return;
+            if (btn && sidebar) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('sidebar-open');
+                });
 
-            const openSidebar = () => {
-                sidebar.classList.add('sidebar-open');
-            };
+                // Close sidebar when clicking outside of it
+                document.addEventListener('click', (e) => {
+                    if (sidebar.classList.contains('sidebar-open') && !sidebar.contains(e.target) && !btn.contains(e.target)) {
+                        sidebar.classList.remove('sidebar-open');
+                    }
+                });
 
-            const closeSidebar = () => {
-                sidebar.classList.remove('sidebar-open');
-            };
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        sidebar.classList.remove('sidebar-open');
+                    }
+                });
+            }
 
-            btn.addEventListener('click', openSidebar);
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') closeSidebar();
-            });
+            // Theme toggle logic
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIconLight = document.getElementById('theme-icon-light');
+            const themeIconDark = document.getElementById('theme-icon-dark');
+            const themeText = document.getElementById('theme-text');
+            const themeBadge = document.getElementById('theme-badge');
+            
+            if (themeToggle) {
+                const applyTheme = (dark) => {
+                    if (dark) {
+                        document.documentElement.classList.add('dark');
+                        if (themeIconLight) themeIconLight.classList.remove('hidden');
+                        if (themeIconDark) themeIconDark.classList.add('hidden');
+                        if (themeText) themeText.textContent = 'Mode Terang';
+                        if (themeBadge) {
+                            themeBadge.textContent = 'On';
+                            themeBadge.className = 'text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-mono uppercase';
+                        }
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        if (themeIconLight) themeIconLight.classList.add('hidden');
+                        if (themeIconDark) themeIconDark.classList.remove('hidden');
+                        if (themeText) themeText.textContent = 'Mode Gelap';
+                        if (themeBadge) {
+                            themeBadge.textContent = 'Off';
+                            themeBadge.className = 'text-xs bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full font-mono uppercase';
+                        }
+                    }
+                };
+
+                const isDark = document.documentElement.classList.contains('dark');
+                applyTheme(isDark);
+
+                themeToggle.addEventListener('click', () => {
+                    const nowDark = !document.documentElement.classList.contains('dark');
+                    localStorage.setItem('theme', nowDark ? 'dark' : 'light');
+                    applyTheme(nowDark);
+                });
+            }
         })();
     </script>
 </body>

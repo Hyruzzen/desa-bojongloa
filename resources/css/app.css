@@ -10,3 +10,109 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Content spacing adjustment */
+.app-content-inner {
+    padding: 3.5rem 1.5rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .app-content-inner {
+        padding: 2rem;
+    }
+}
+
+/* Global Dark Mode Overrides */
+.dark body {
+    background-color: #0f172a !important; /* Slate 900 */
+    color: #f1f5f9 !important; /* Slate 100 */
+}
+
+.dark #app-sidebar {
+    background-color: #1e293b !important; /* Slate 800 */
+    border-color: #334155 !important; /* Slate 700 */
+}
+
+.dark #app-sidebar * {
+    color: #cbd5e1 !important; /* Slate 300 */
+}
+
+.dark #app-sidebar .text-slate-900 {
+    color: #f1f5f9 !important; /* Slate 100 */
+}
+
+.dark #app-sidebar a.bg-slate-50 {
+    background-color: #334155 !important; /* Slate 700 */
+    color: #f1f5f9 !important;
+}
+
+.dark #app-sidebar a:hover {
+    background-color: #334155 !important;
+}
+
+.dark .app-main {
+    background-color: #0f172a !important; /* Slate 900 */
+}
+
+.dark .bg-white {
+    background-color: #1e293b !important; /* Slate 800 */
+}
+
+.dark .bg-gray-50,
+.dark .bg-slate-50 {
+    background-color: #1e293b !important; /* Slate 800 */
+}
+
+.dark .border-slate-100, 
+.dark .border-slate-200, 
+.dark .border-slate-300,
+.dark .border-slate-400,
+.dark .border {
+    border-color: #334155 !important;
+}
+
+.dark .text-slate-900, 
+.dark .text-slate-800, 
+.dark .text-slate-700 {
+    color: #f1f5f9 !important;
+}
+
+.dark .text-slate-600, 
+.dark .text-slate-500, 
+.dark .text-slate-400 {
+    color: #94a3b8 !important; /* Slate 400 */
+}
+
+.dark input, 
+.dark select, 
+.dark textarea {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #475569 !important;
+}
+
+.dark input:focus, 
+.dark select:focus, 
+.dark textarea:focus {
+    border-color: #3b82f6 !important;
+    outline: none;
+}
+
+.dark button:not(#sidebar-toggle, .bg-blue-600, .bg-blue-700, .bg-red-600, .bg-green-600, .bg-indigo-600, .bg-gradient-to-br) {
+    background-color: #334155 !important;
+    color: #f1f5f9 !important;
+    border-color: #475569 !important;
+}
+
+.dark #sidebar-toggle {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark #sidebar-toggle svg path {
+    stroke: #f1f5f9 !important;
+}
+
+.dark .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important;
+}

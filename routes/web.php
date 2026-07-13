@@ -7,7 +7,9 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\ScannerController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn () => redirect()->route('dashboard'));
+Route::get('/', function () {
+    return view('landing');
+})->name('landing');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
