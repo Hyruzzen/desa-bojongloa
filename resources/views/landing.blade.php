@@ -114,6 +114,38 @@
             transform: translateY(0);
         }
 
+        .page-transition-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            border-radius: 9999px;
+            transform: scale(0.6);
+            opacity: 0;
+            background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 45%, #38bdf8 100%);
+            transition: opacity 0.35s ease, transform 0.55s cubic-bezier(.2, .8, .2, 1), border-radius 0.55s ease;
+        }
+
+        .page-transition-overlay.show {
+            opacity: 1;
+            transform: scale(1);
+            border-radius: 0;
+            pointer-events: auto;
+        }
+
+        .page-transition-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 70%);
+            animation: morphPulse 1.1s ease-in-out infinite alternate;
+        }
+
+        @keyframes morphPulse {
+            from { transform: scale(0.96); opacity: 0.7; }
+            to { transform: scale(1.04); opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             .hero-text { font-size: 2rem; line-height: 1.2; }
         }
@@ -152,7 +184,7 @@
                         Buka Dashboard
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="bg-black dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-black text-xs font-semibold px-6 py-2.5 rounded-full shadow transition-all active:scale-95 tracking-wider uppercase">
+                    <a href="{{ route('login') }}" data-transition="morph" class="bg-black dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-200 text-white dark:text-black text-xs font-semibold px-6 py-2.5 rounded-full shadow transition-all active:scale-95 tracking-wider uppercase">
                         Masuk Sistem
                     </a>
                 @endauth
@@ -186,7 +218,7 @@
                                 Buka Dashboard
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="inline-block bg-black dark:bg-white text-white dark:text-black font-semibold text-xs tracking-widest uppercase px-9 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 hover:bg-slate-800 dark:hover:bg-slate-200">
+                            <a href="{{ route('login') }}" data-transition="morph" class="inline-block bg-black dark:bg-white text-white dark:text-black font-semibold text-xs tracking-widest uppercase px-9 py-3.5 rounded-full shadow-lg hover:shadow-xl transition-all active:scale-95 hover:bg-slate-800 dark:hover:bg-slate-200">
                                 Lihat Sistem
                             </a>
                         @endauth
@@ -437,9 +469,11 @@
                             </div>
                             <div class="flex items-start gap-4 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <div class="w-10 h-10 bg-purple-100 dark:bg-purple-950/50 rounded-xl flex items-center justify-center text-lg shrink-0">🗺️</div>
-                                <div>
+                                <div class="w-full">
                                     <p class="font-semibold text-slate-900 dark:text-white text-sm">Peta Lokasi</p>
-                                    <a href="https://www.openstreetmap.org/#map=15/-6.953265430973999/107.76572942733766" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 text-sm hover:underline mt-0.5 block">Buka di OpenStreetMap ↗</a>
+                                    <div class="mt-3 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.473176567131!2d107.7631924740361!3d-6.953376368073244!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68c482cdfdbd5f%3A0x707e5fdaf44a261a!2sKantor%20Desa%20Bojongloa%20-%20Rancaekek!5e0!3m2!1sid!2sid!4v1783962694581!5m2!1sid!2sid" width="100%" height="240" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -455,7 +489,7 @@
                                 Buka Dashboard Arsip →
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="block w-full bg-white text-blue-800 font-bold text-center py-4 rounded-2xl hover:bg-blue-50 transition-colors active:scale-95">
+                            <a href="{{ route('login') }}" data-transition="morph" class="block w-full bg-white text-blue-800 font-bold text-center py-4 rounded-2xl hover:bg-blue-50 transition-colors active:scale-95">
                                 Masuk ke Portal →
                             </a>
                         @endauth
@@ -466,6 +500,36 @@
         </section>
 
     </main>
+
+    <script>
+        (function() {
+            if (!document.querySelector('.page-transition-overlay')) {
+                const overlay = document.createElement('div');
+                overlay.className = 'page-transition-overlay';
+                document.body.appendChild(overlay);
+            }
+
+            const overlay = document.querySelector('.page-transition-overlay');
+
+            const triggerMorphTransition = (href) => {
+                if (!href || href.startsWith('#')) return false;
+                overlay?.classList.add('show');
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 400);
+                return true;
+            };
+
+            document.querySelectorAll('[data-transition="morph"]').forEach((link) => {
+                link.addEventListener('click', (event) => {
+                    const href = link.getAttribute('href');
+                    if (triggerMorphTransition(href)) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        })();
+    </script>
 
     <!-- ===== FOOTER ===== -->
     <footer class="bg-slate-900 text-slate-300 py-12">
