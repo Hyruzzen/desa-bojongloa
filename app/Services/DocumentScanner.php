@@ -69,17 +69,7 @@ class DocumentScanner
 
     private function scanImage($file): array
     {
-        // Gemini Vision — encode ke base64
-        if ($this->gemini->isConfigured()) {
-            $base64   = base64_encode(file_get_contents($file->getRealPath()));
-            $mimeType = $file->getMimeType() ?? 'image/jpeg';
-
-            $result         = $this->gemini->analyzeFromImage($base64, $mimeType);
-            $result['text'] = '';
-            return $result;
-        }
-
-        // Fallback jika tanpa Gemini: OCR untuk ekstrak teks dari gambar
+        // Always run Tesseract OCR first to extract text
         $text = '';
         try {
             $text = $this->ocr->read($file->getRealPath());
@@ -87,6 +77,14 @@ class DocumentScanner
             $text = '';
         }
 
+        // If Gemini is active, send the extracted text to Gemini AI
+        if ($this->gemini->isConfigured()) {
+            $result         = $this->gemini->analyzeFromText($text);
+            $result['text'] = $text;
+            return $result;
+        }
+
+        // Fallback if Gemini is not configured
         if (!empty($text)) {
             return array_merge(
                 $this->legacyExtract($text),
