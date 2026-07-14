@@ -51,6 +51,7 @@
 
     <div class="flex h-screen w-full overflow-hidden">
         <aside id="app-sidebar" class="w-64 flex-shrink-0 h-full border-r bg-white fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-200 md:translate-x-0 md:static md:relative md:h-full flex flex-col">
+
             <div class="px-6 py-5 border-b border-slate-100">
                 <div class="pl-12 md:pl-0">
                     <p class="text-lg font-bold leading-tight text-slate-900">E-Arsip</p>
@@ -158,9 +159,13 @@
 
             if (btn && sidebar) {
                 btn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
+                    // Toggle + pastikan z-index tetap di atas
                     sidebar.classList.toggle('sidebar-open');
+                    sidebar.classList.add('z-50');
                 });
+
 
                 // Close sidebar when clicking outside of it
                 document.addEventListener('click', (e) => {

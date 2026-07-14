@@ -1,15 +1,10 @@
-# TODO - Perbaikan Fitur Scan Dokumen
+# TODO
 
-## Rencana
-1. Tambahkan logging debug pada alur scan untuk mengetahui apakah hasil kosong karena Gemini gagal/parsing, atau PDF/ekstraksi teks.
-2. Perbaiki `GeminiService::callApi()` agar pengambilan `text` tidak hardcode index `parts[0]`, melainkan mencari text pertama yang tersedia.
-3. Tambahkan fallback OCR saat Gemini tidak aktif untuk file gambar (JPG/PNG), lalu gunakan `legacyExtract()` dari hasil OCR.
-4. Jalankan testing pada 3 skenario: PDF+Gemini aktif, PDF+Gemini nonaktif, Gambar+Gemini nonaktif.
+- [x] Sisipkan komponen Column Chart (Chart.js) di `resources/views/dashboard.blade.php` tepat antara section `Aktivitas Terbaru` dan `Arsip Terbaru`.
 
-## Status
-- [x] Step 1: Logging debug
-- [x] Step 2: Robust parsing response Gemini
-- [x] Step 3: OCR fallback untuk gambar
-- [ ] Step 4: Testing & verifikasi
+- [x] Gunakan data `$arsipPerKategori` untuk membentuk label kategori dan nilai jumlah arsip per kategori.
+- [x] Terapkan styling dark mode: background gelap bernuansa `#1e293b`, teks dan grid chart yang kontras, serta warna batang biru pastel.
+- [x] Tambahkan script inisialisasi Chart.js (stacking, responsive, height ~ 280px).
+- [x] Verifikasi tidak ada error Blade/JS dan pastikan chart tampil di halaman Dashboard.
 
 
