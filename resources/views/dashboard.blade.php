@@ -1,14 +1,7 @@
 ﻿@extends('layouts.app')
 @section('title', 'Dashboard')
 @section('content')
-
-<div class="w-full overflow-x-auto pb-4">
-    <div class="min-w-[600px] space-y-6"> 
-
-
-
 <div class="space-y-6">
-    <!-- Top Stats -->
     <div class="grid gap-4 grid-cols-1 xl:grid-cols-3">
         <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
             <p class="text-sm text-slate-500">Total Arsip</p>
@@ -29,11 +22,22 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
+    <div class="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm transition-colors dark:border-slate-700 dark:bg-slate-800">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Distribusi Dokumen</p>
+                <h2 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Jumlah dokumen per kategori</h2>
+            </div>
+            <span class="inline-flex items-center rounded-full bg-cyan-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-700 dark:bg-cyan-500/10 dark:text-cyan-300">Bar Chart</span>
+        </div>
+
+        <div id="documentCategoryChartWrapper" class="mt-6 h-[320px] overflow-hidden rounded-3xl bg-white dark:bg-slate-900">
+            <canvas id="documentCategoryChart" class="w-full h-full" style="display: block; background-color: transparent;"></canvas>
+        </div>
+    </div>
+
     <div class="grid gap-4 xl:grid-cols-3">
         <section class="xl:col-span-2 space-y-4">
-            
-            <!-- Ringkasan Arsip -->
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div>
@@ -59,28 +63,6 @@
                 </div>
             </div>
 
-            <!-- Kolom Chart: jumlah dokumen per kategori -->
-            <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800/30 dark:bg-[#0f172a]">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Statistik Arsip</p>
-                        <h2 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Jumlah per Kategori</h2>
-                    </div>
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-600 dark:bg-slate-800/60 dark:text-slate-200">Breakdown</span>
-                </div>
-
-                <div class="mt-6">
-                    <div class="rounded-2xl border border-slate-100 bg-white p-4 dark:border-slate-700/50 dark:bg-[#111c33]/60">
-                        <!-- Tinggi div dinaikkan agar legend punya ruang lebih -->
-                        <!-- Bagian yang baru (Responsive Height) -->
-<div class="relative h-64 md:h-[320px] overflow-hidden rounded-2xl">
-    <canvas id="arsipPerKategoriChart" class="h-full w-full"></canvas>
-</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Arsip Terbaru -->
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between gap-4">
                     <div>
@@ -108,177 +90,8 @@
                     @endforelse
                 </div>
             </div>
-
-            <!-- Chart.js + inisialisasi -->
-            <div class="grid gap-4 grid-cols-1 xl:grid-cols-3">
-            <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    const canvas = document.getElementById('arsipPerKategoriChart');
-                    if (!canvas || !window.Chart) return;
-
-                    const labels = @json($arsipPerKategori->pluck('nama')->values());
-                    const data = @json($arsipPerKategori->pluck('arsips_count')->values());
-
-                    const isDark = document.documentElement.classList.contains('dark');
-                    const themeToggleButton = document.getElementById('theme-toggle');
-
-                    // Definisi Variasi Warna Baris (Palette)
-                    const colorPalette = [
-                        { bg: 'rgba(59, 130, 246, 0.85)', border: 'rgb(59, 130, 246)' },  // Blue
-                        { bg: 'rgba(16, 185, 129, 0.85)', border: 'rgb(16, 185, 129)' },  // Emerald
-                        { bg: 'rgba(245, 158, 11, 0.85)', border: 'rgb(245, 158, 11)' },  // Amber
-                        { bg: 'rgba(239, 68, 68, 0.85)',  border: 'rgb(239, 68, 68)' },   // Red
-                        { bg: 'rgba(139, 92, 246, 0.85)', border: 'rgb(139, 92, 246)' },  // Violet
-                        { bg: 'rgba(6, 182, 212, 0.85)',  border: 'rgb(6, 182, 212)' },   // Cyan
-                        { bg: 'rgba(236, 72, 153, 0.85)', border: 'rgb(236, 72, 153)' },  // Pink
-                        { bg: 'rgba(249, 115, 22, 0.85)', border: 'rgb(249, 115, 22)' },  // Orange
-                    ];
-
-                    // Melakukan mapping warna sesuai jumlah kategori (berulang jika jumlah label lebih dari warna palette)
-                    const backgroundColors = labels.map((_, i) => colorPalette[i % colorPalette.length].bg);
-                    const borderColors = labels.map((_, i) => colorPalette[i % colorPalette.length].border);
-
-                    // Konfigurasi responsif mode terang/gelap untuk text dan grid
-                    const getThemeConfig = (darkMode) => ({
-                        grid: darkMode ? 'rgba(148, 163, 184, 0.15)' : 'rgba(15, 23, 42, 0.08)',
-                        text: darkMode ? '#e2e8f0' : '#475569',
-                        tooltipBg: darkMode ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-                        tooltipBorder: darkMode ? 'rgba(148, 163, 184, 0.35)' : 'rgba(15, 23, 42, 0.10)',
-                    });
-
-                    let themeConfig = getThemeConfig(isDark);
-
-                    const applyTheme = () => {
-                        const darkNow = document.documentElement.classList.contains('dark');
-                        const newConfig = getThemeConfig(darkNow);
-
-                        chart.options.scales.y.grid.color = newConfig.grid;
-                        chart.options.scales.x.grid.color = newConfig.grid;
-                        chart.options.scales.x.ticks.color = newConfig.text;
-                        chart.options.scales.y.ticks.color = newConfig.text;
-
-                        chart.options.plugins.tooltip.backgroundColor = newConfig.tooltipBg;
-                        chart.options.plugins.tooltip.titleColor = newConfig.text;
-                        chart.options.plugins.tooltip.bodyColor = newConfig.text;
-                        chart.options.plugins.tooltip.borderColor = newConfig.tooltipBorder;
-
-                        // Update warna text pada Legend
-                        chart.options.plugins.legend.labels.color = newConfig.text;
-
-                        chart.update();
-                    };
-
-                    const chart = new Chart(canvas, {
-                        type: 'bar',
-                        data: {
-                            labels,
-                            datasets: [
-                                {
-                                    label: 'Jumlah Arsip',
-                                    data,
-                                    backgroundColor: backgroundColors, // Terapkan array warna
-                                    borderColor: borderColors,         // Terapkan array warna
-                                    borderWidth: 1,
-                                    borderRadius: 8,
-                                    maxBarThickness: 48
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            animation: { duration: 500 },
-                            plugins: {
-                                legend: {
-                                    display: true, 
-                                    position: 'bottom', // Legend ditempatkan di bawah
-                                    labels: {
-                                        color: themeConfig.text,
-                                        usePointStyle: true, // Marker legend menjadi bentuk bulat (lebih rapi)
-                                        boxWidth: 10,
-                                        padding: 15,
-                                        font: { size: 12 },
-                                        // Customisasi label legend agar membaca per Kategori (Baris) bukan nama Datasetnya
-                                        generateLabels: (chart) => {
-                                            const data = chart.data;
-                                            if (data.labels.length && data.datasets.length) {
-                                                return data.labels.map((label, i) => {
-                                                    const meta = chart.getDatasetMeta(0);
-                                                    return {
-                                                        text: label,
-                                                        fillStyle: backgroundColors[i],
-                                                        strokeStyle: borderColors[i],
-                                                        lineWidth: 1,
-                                                        // Menyembunyikan baris jika legend ditekan
-                                                        hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
-                                                        index: i
-                                                    };
-                                                });
-                                            }
-                                            return [];
-                                        }
-                                    },
-                                    // Aksi klik legend agar bisa menghilangkan/menampilkan baris grafik tertentu
-                                    onClick: (e, legendItem, legend) => {
-                                        const index = legendItem.index;
-                                        const chart = legend.chart;
-                                        const meta = chart.getDatasetMeta(0);
-                                        // Toggle sembunyikan/munculkan data
-                                        meta.data[index].hidden = !meta.data[index].hidden;
-                                        chart.update();
-                                    }
-                                },
-                                tooltip: {
-                                    backgroundColor: themeConfig.tooltipBg,
-                                    titleColor: themeConfig.text,
-                                    bodyColor: themeConfig.text,
-                                    borderColor: themeConfig.tooltipBorder,
-                                    borderWidth: 1,
-                                    padding: 10
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    grid: { display: false },
-                                    ticks: {
-                                        display: false // MENGHILANGKAN teks miring (label kategori) di sumbu X
-                                    }
-                                },
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: themeConfig.grid,
-                                        drawBorder: false
-                                    },
-                                    ticks: {
-                                        color: themeConfig.text,
-                                        font: { size: 12 },
-                                        precision: 0 // Pastikan angka bulat
-                                    }
-                                }
-                            }
-                        }
-                    });
-
-                    // Update chart saat toggle tema diklik
-                    if (themeToggleButton) {
-                        themeToggleButton.addEventListener('click', () => {
-                            setTimeout(() => applyTheme(), 10);
-                        });
-                    }
-
-                    // Deteksi perubahan otomatis (System Preference / Tailwind class mutation)
-                    const observer = new MutationObserver(() => applyTheme());
-                    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-                    canvas.__chart = chart;
-                });
-            </script>
         </section>
-</div>
 
-        <!-- Sidebar -->
         <aside class="space-y-4">
             <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between gap-4">
@@ -317,6 +130,145 @@
         </aside>
     </div>
 </div>
-    </div>
-</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('documentCategoryChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const labels = @json($arsipPerKategori->pluck('nama')->all());
+        const values = @json($arsipPerKategori->pluck('arsips_count')->all());
+
+        const palette = [
+            { bg: 'rgba(59, 130, 246, 0.85)', border: '#3b82f6' },
+            { bg: 'rgba(16, 185, 129, 0.85)', border: '#10b981' },
+            { bg: 'rgba(168, 85, 247, 0.85)', border: '#a855f7' },
+            { bg: 'rgba(249, 115, 22, 0.85)', border: '#f97316' },
+            { bg: 'rgba(244, 114, 182, 0.85)', border: '#ec4899' },
+            { bg: 'rgba(14, 165, 233, 0.85)', border: '#0ea5e9' },
+            { bg: 'rgba(239, 68, 68, 0.85)', border: '#ef4444' },
+        ];
+
+        const getThemeColors = () => {
+            const isDark = document.documentElement.classList.contains('dark');
+
+            return {
+                text: isDark ? '#f8fafc' : '#0f172a',
+                grid: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(15,23,42,0.08)',
+                border: isDark ? '#475569' : '#cbd5e1',
+                tooltipBg: isDark ? 'rgba(15,23,42,0.95)' : 'rgba(255,255,255,0.97)',
+                tooltipText: isDark ? '#f8fafc' : '#0f172a',
+                canvasBg: isDark ? '#0f172a' : '#ffffff',
+                wrapperBg: isDark ? '#0f172a' : '#ffffff',
+            };
+        };
+
+        const wrapper = document.getElementById('documentCategoryChartWrapper');
+
+        const chartBackgroundPlugin = {
+            id: 'chartBackground',
+            beforeDraw(chart) {
+                const ctx = chart.ctx;
+                const canvasBg = chart.options.plugins.chartBackground?.backgroundColor;
+                if (!canvasBg) return;
+
+                ctx.save();
+                ctx.fillStyle = canvasBg;
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            },
+        };
+
+        const chart = new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Jumlah Dokumen',
+                    data: values,
+                    backgroundColor: labels.map((_, index) => palette[index % palette.length].bg),
+                    borderColor: labels.map((_, index) => palette[index % palette.length].border),
+                    borderWidth: 1.5,
+                    borderRadius: 8,
+                    maxBarThickness: 44,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    chartBackground: {
+                        backgroundColor: getThemeColors().canvasBg,
+                    },
+                    legend: {
+                        labels: {
+                            color: getThemeColors().text,
+                            boxWidth: 12,
+                            padding: 16,
+                            font: { family: 'Inter, ui-sans-serif, system-ui', size: 13, weight: '600' },
+                        },
+                    },
+                    tooltip: {
+                        backgroundColor: getThemeColors().tooltipBg,
+                        titleColor: getThemeColors().tooltipText,
+                        bodyColor: getThemeColors().tooltipText,
+                        borderColor: getThemeColors().border,
+                        borderWidth: 1,
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: { display: false, color: getThemeColors().grid },
+                        ticks: { display: false },
+                        border: { display: false },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: getThemeColors().grid },
+                        ticks: { color: getThemeColors().text, font: { size: 12, weight: '600' } },
+                        border: { color: getThemeColors().border },
+                    },
+                },
+            },
+            plugins: [chartBackgroundPlugin],
+        });
+
+        const applyTheme = () => {
+            const colors = getThemeColors();
+
+            if (wrapper) {
+                wrapper.style.backgroundColor = colors.wrapperBg;
+            }
+            canvas.style.backgroundColor = colors.canvasBg;
+            canvas.style.borderRadius = '1rem';
+            chart.options.plugins.chartBackground.backgroundColor = colors.canvasBg;
+            chart.options.plugins.legend.labels.color = colors.text;
+            chart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+            chart.options.plugins.tooltip.titleColor = colors.tooltipText;
+            chart.options.plugins.tooltip.bodyColor = colors.tooltipText;
+            chart.options.scales.x.ticks.color = colors.text;
+            chart.options.scales.x.grid.color = colors.grid;
+            chart.options.scales.x.border.color = colors.border;
+            chart.options.scales.y.ticks.color = colors.text;
+            chart.options.scales.y.grid.color = colors.grid;
+            chart.options.scales.y.border.color = colors.border;
+
+            chart.update();
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    applyTheme();
+                }
+            });
+        });
+
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+        applyTheme();
+    });
+</script>
 @endsection
