@@ -1,5 +1,8 @@
 # syntax=docker/dockerfile:1
 
+#########################
+# Build Frontend Assets #
+#########################
 FROM node:22-alpine AS node
 
 WORKDIR /app
@@ -11,8 +14,10 @@ COPY . .
 
 RUN npm run build
 
-
-FROM dunglas/frankenphp:php8.3
+########################
+# PHP + FrankenPHP     #
+########################
+FROM dunglas/frankenphp:1-php8.3
 
 WORKDIR /app
 
@@ -35,12 +40,15 @@ RUN composer install \
 
 COPY --from=node /app/public/build ./public/build
 
-RUN mkdir -p storage/framework/{cache,sessions,views} \
-    && chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
 
-EXPOSE 8080
+COPY Caddyfile /etc/caddy/Caddyfile
 
 ENV SERVER_NAME=:8080
 
+<<<<<<< HEAD
+EXPOSE 8080
+=======
 CMD ["frankenphp", "run"]
+>>>>>>> f9d4b490f8d5dcbdbee6aa1e848b6fd79bea4726
