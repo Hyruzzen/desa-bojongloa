@@ -48,7 +48,11 @@ COPY Caddyfile /etc/caddy/Caddyfile
 ENV SERVER_NAME=:8080
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 EXPOSE 8080
 =======
 CMD ["frankenphp", "run"]
 >>>>>>> f9d4b490f8d5dcbdbee6aa1e848b6fd79bea4726
+=======
+EXPOSE 8080
+>>>>>>> 8186dc6 (tes 2)
