@@ -41,4 +41,6 @@ RUN mkdir -p storage/framework/{cache,sessions,views} \
 
 EXPOSE 8080
 
-CMD ["frankenphp","php-server","--root","/app/public","--listen",":8080"]
+ENV SERVER_NAME=:8080
+
+CMD ["frankenphp", "run"]
